@@ -1,0 +1,71 @@
+import sys
+def LCSBackTrack(s: str, t: str) -> str:
+    n = len(s)
+    m = len(t)
+
+    lengthmatrix = [ [ 0 for a in range(m+1) ] for b in range(n+1) ]
+    lengthmatrix[0][0] = 0
+    backtrack = [ [ 0 for a in range(m+1) ] for b in range(n+1) ]
+
+    #deleting gives no score
+    for i in range(1, n+1):
+        lengthmatrix[i][0] = 0
+    for j in range(1, m+1):
+        lengthmatrix[0][j] = 0
+
+    #assign the pointers to the backtrack matrix
+    for i in range(1, n+1):
+        for j in range(1, m+1):
+            match = 0
+            if s[i-1] == t[j-1]:
+                match = 1
+            
+            #print(i)
+            #print(j)
+
+            lengthmatrix[i][j] = max((lengthmatrix[i-1][j]), (lengthmatrix[i][j-1]), (lengthmatrix[i-1][j-1] + match))
+
+            #print(lengthmatrix[i][j])
+
+            if lengthmatrix[i][j] == lengthmatrix[i][j-1]:
+                backtrack[i][j] = 'down'
+                #print('down')
+            elif lengthmatrix[i][j] == lengthmatrix[i-1][j]:
+                backtrack[i][j] = 'right'
+                #print('right')
+            elif lengthmatrix[i][j] == lengthmatrix[i-1][j-1] + match:
+                backtrack[i][j] = 'dr'
+                #print('dr')
+    #print(lengthmatrix)
+    #print(backtrack)
+    return backtrack
+
+def OutputLCS(backtrack, v, i, j):
+    if i == 0 or j == 0:
+        return ''
+    #print(i)
+    #print(j)
+    
+    if backtrack[i][j] == 'down':
+        return OutputLCS(backtrack, v, i, j-1)
+    elif backtrack[i][j] == 'right':
+        return OutputLCS(backtrack, v, i-1, j)
+    else:
+        #print(v)
+        return OutputLCS(backtrack, v, i-1, j-1) + v[i-1]
+
+
+def LongestCommonSubsequence(s: str, t: str) -> str:
+    backtrack = LCSBackTrack(s, t)
+    
+    path = OutputLCS(backtrack, s, len(s), len(t))
+
+    return path
+
+sys.setrecursionlimit(10000)
+
+file = open('Chapter4\dataset_865447_5.txt')
+string1 = file.readline().strip()
+string2 = file.readline().strip()
+
+print(LongestCommonSubsequence(string1, string2))
